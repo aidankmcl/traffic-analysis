@@ -4,8 +4,8 @@
       <h1>Cool Visualization</h1>
     </header>
     <section>
-      <input type="date" v-model="fromDate" name="fromDate">
-      <input type="date" v-model="toDate" name="toDate">
+      <input type="date" v-model="fromDatestring" @change="updateRange" name="fromDate">
+      <input type="date" v-model="toDatestring" @change="updateRange" name="toDate">
       <bandwidth-graph :data="data"></bandwidth-graph>
     </section>
   </div>
@@ -13,6 +13,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import moment from 'moment'
 
 import BandwidthGraph from './../components/BandwidthGraph'
 import DataTimeline from './../components/DataTimeline'
@@ -21,22 +22,31 @@ export default {
   name: 'Visualization',
   data: function () {
     return {
-      fromDate: new Date(),
-      toDate: new Date()
+      fromDatestring: moment().subtract(1, 'months').format('YYYY-MM-DD'),
+      toDatestring: moment().format('YYYY-MM-DD')
     }
   },
   computed: {
-    ...mapState(['data', 'info'])
+    ...mapState(['data']),
+    fromDate: function () {
+      return moment(this.fromDatestring).toDate()
+    },
+    toDate: function () {
+      return moment(this.toDatestring).toDate()
+    }
   },
   components: {
     'bandwidth-graph': BandwidthGraph,
     'data-timeline': DataTimeline
   },
   created () {
-    this.$store.dispatch('updateRange')
+    this.updateRange()
   },
   methods: {
-    updateRange (date) {}
+    updateRange () {
+      let range = {fromTime: this.fromDate.getTime(), toTime: this.toDate.getTime()}
+      this.$store.dispatch('updateRange', range)
+    }
   }
 }
 </script>

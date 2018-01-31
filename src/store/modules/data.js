@@ -16,24 +16,26 @@ export default {
   },
   mutations: {
     setData (state, data) {
-      console.log(data)
       state.data = data
     },
-    setFromTime (state, date) {
-      return date.getTime()
+    // Both of these take time in milliseconds since epoch
+    setFromTime (state, time) {
+      return time
     },
-    setToTime (state, date) {
-      return date.getTime()
+    setToTime (state, time) {
+      return time
     }
   },
   actions: {
-    updateRange ({ state, rootState, dispatch }) {
-      console.log('time time time', state.fromTime, state.toTime)
+    updateRange ({ state, rootState, dispatch, commit }, range) {
       let payload = {
         token: rootState.user.token,
-        fromTime: state.fromTime,
-        toTime: state.toTime
+        fromTime: range.fromTime,
+        toTime: range.toTime
       }
+
+      commit('setFromTime', range.fromTime)
+      commit('setToTime', range.toTime)
 
       dispatch('getBandwidthData', payload)
         .then((res) => {
