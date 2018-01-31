@@ -1,8 +1,11 @@
 <template>
   <div class="hello">
     <h1>Sign In</h1>
-    <!-- NOTE: Only for demo purposes, would never toss credentials into app code -->
-    <login-form :fill-username="sampleUsername" :fill-password="samplePassword"></login-form>
+    <login-form
+      @success="proceedToProfile"
+      @failure="handleError"
+      :fill-username="sampleUsername"
+      :fill-password="samplePassword"></login-form>
   </div>
 </template>
 
@@ -15,9 +18,23 @@ export default {
     'login-form': LoginForm
   },
   data () {
+    // NOTE: Only for demo, would never toss credentials into app code!
     return {
       sampleUsername: 'shinynewclient',
       samplePassword: 'siriusblack'
+    }
+  },
+  methods: {
+    proceedToProfile: function (token) {
+      console.log('success')
+      this.$store.dispatch('getUserInfo', token)
+        .then((userInfo) => {
+          this.$router.push('/')
+        })
+        .catch((err) => { console.error(err) })
+    },
+    handleError: function (err) {
+      console.error(err)
     }
   }
 }

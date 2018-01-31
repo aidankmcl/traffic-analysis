@@ -1,11 +1,31 @@
+/*
+Requests required for User actions
+*/
+
 import axios from 'axios'
 
+function login (credentials, success, failure) {
+  axios.post(
+    'http://localhost:3000/auth',
+    {
+      identifiant: credentials.username,
+      password: credentials.password
+    })
+    .then(success)
+    .catch(failure)
+}
+
+function getInfo (token, success, failure) {
+  axios.post(
+    'http://localhost:3000/myinfo',
+    {
+      'session_token': token
+    })
+    .then(success)
+    .catch(failure)
+}
+
 export default {
-  login: function (username, password) {
-    axios.post('http://localhost:3000/auth', {identifiant: username, password: password})
-      .then((res) => {
-        console.log(res.data)
-      })
-      .catch((err) => { console.error(err.response.data) })
-  }
+  login,
+  getInfo
 }

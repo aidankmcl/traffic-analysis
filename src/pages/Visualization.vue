@@ -1,15 +1,15 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <h1>Cool Visualization for {{ userInfo.company }}</h1>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Visualization',
-  data () {
-    return {
-      msg: ''
+  computed: {
+    userInfo () {
+      return this.$store.state.user.info
     }
   }
 }
