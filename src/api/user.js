@@ -25,7 +25,18 @@ function getInfo (token, success, failure) {
     .catch(failure)
 }
 
+function logout (token, success, failure) {
+  axios.post(
+    'http://localhost:3000/logout',
+    {
+      'session_token': token
+    })
+    .then(success)
+    .catch(failure)
+}
+
 export default {
   login,
-  getInfo
+  getInfo,
+  logout
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div>
     <h1>Sign In</h1>
     <login-form
       @success="proceedToProfile"
@@ -20,18 +20,19 @@ export default {
   data () {
     // NOTE: Only for demo, would never toss credentials into app code!
     return {
-      sampleUsername: 'shinynewclient',
-      samplePassword: 'siriusblack'
+      sampleUsername: 'swagtv',
+      samplePassword: 'bling$bling'
     }
   },
   methods: {
     proceedToProfile: function (token) {
-      console.log('success')
       this.$store.dispatch('getUserInfo', token)
         .then((userInfo) => {
           this.$router.push('/')
         })
-        .catch((err) => { console.error(err) })
+        .catch((err) => {
+          console.error(err)
+        })
     },
     handleError: function (err) {
       console.error(err)

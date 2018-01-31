@@ -36,7 +36,7 @@ export default {
         })
         .catch((err) => {
           // TODO: Default handling of errors within component.
-          this.$emit('failure', err.data)
+          this.$emit('failure', err)
         })
     }
   }

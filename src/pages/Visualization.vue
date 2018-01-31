@@ -1,16 +1,42 @@
 <template>
-  <div class="hello">
-    <h1>Cool Visualization for {{ userInfo.company }}</h1>
+  <div>
+    <header class="hello">
+      <h1>Cool Visualization</h1>
+    </header>
+    <section>
+      <input type="date" v-model="fromDate" name="fromDate">
+      <input type="date" v-model="toDate" name="toDate">
+      <bandwidth-graph :data="data"></bandwidth-graph>
+    </section>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
+import BandwidthGraph from './../components/BandwidthGraph'
+import DataTimeline from './../components/DataTimeline'
+
 export default {
   name: 'Visualization',
-  computed: {
-    userInfo () {
-      return this.$store.state.user.info
+  data: function () {
+    return {
+      fromDate: new Date(),
+      toDate: new Date()
     }
+  },
+  computed: {
+    ...mapState(['data', 'info'])
+  },
+  components: {
+    'bandwidth-graph': BandwidthGraph,
+    'data-timeline': DataTimeline
+  },
+  created () {
+    this.$store.dispatch('updateRange')
+  },
+  methods: {
+    updateRange (date) {}
   }
 }
 </script>
