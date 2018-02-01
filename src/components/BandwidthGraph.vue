@@ -8,6 +8,7 @@
 <script>
 import Vue from 'vue'
 import VueC3 from 'vue-c3'
+import moment from 'moment'
 
 export default {
   props: {
@@ -54,12 +55,32 @@ export default {
       zoom: {
         enabled: true
       },
+      point: {
+        show: false
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            format: function (x) { return moment(x).format('M/DD') }
+          }
+        },
+        y: {
+          tick: {
+            format: function (x) { return (x / 1000000000).toString() + 'Gbps' }
+          }
+        }
+      },
       data: {
+        columns: columns,
         xs: {
           'P2P': 'x1',
           'CDN': 'x2'
         },
-        columns: columns
+        types: {
+          'P2P': 'area-spline',
+          'CDN': 'area-spline'
+        }
       }
     }
 
