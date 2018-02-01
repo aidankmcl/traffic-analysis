@@ -20,10 +20,10 @@ export default {
     },
     // Both of these take time in milliseconds since epoch
     setFromTime (state, time) {
-      return time
+      state.fromTime = time
     },
     setToTime (state, time) {
-      return time
+      state.toTime = time
     }
   },
   actions: {

@@ -6,7 +6,7 @@
     <section>
       <input type="date" v-model="fromDatestring" @change="updateRange" name="fromDate">
       <input type="date" v-model="toDatestring" @change="updateRange" name="toDate">
-      <bandwidth-graph id="bandwidth" :graphData="networkData"></bandwidth-graph>
+      <bandwidth-graph :bandwidthData="networkData"></bandwidth-graph>
     </section>
   </div>
 </template>
@@ -45,7 +45,7 @@ export default {
     this.updateRange()
   },
   methods: {
-    updateRange () {
+    updateRange (stuff) {
       let range = {fromTime: this.fromDate.getTime(), toTime: this.toDate.getTime()}
       this.$store.dispatch('updateRange', range)
     }

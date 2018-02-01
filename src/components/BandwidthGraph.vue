@@ -1,7 +1,6 @@
 <template>
   <div>
     <vue-c3 :handler="handler" class="bandwidth-chart"></vue-c3>
-    <button @click="log(graphData)"></button>
   </div>
 </template>
 
@@ -11,47 +10,65 @@ import VueC3 from 'vue-c3'
 import moment from 'moment'
 
 export default {
-  props: {
-    id: { type: String, required: true },
-    fromTime: Number,
-    toTime: Number,
-    graphData: Object
-  },
   components: {
     'vue-c3': VueC3
+  },
+  props: {
+    bandwidthData: Object
   },
   data: function () {
     return {
       handler: new Vue()
     }
   },
-  methods: {},
-  mounted () {
-    var columns = [
-      ['x1'],
-      ['x2'],
-      ['P2P'],
-      ['CDN']
-    ]
+  watch: {
+    bandwidthData: function () {
+      this.updateChart()
+    }
+  },
+  methods: {
+    updateChart () {
+      const columns = this.prepareColumnData()
+      this.handler.$emit('dispatch', (chart) => chart.load({
+        columns: columns,
+        unload: ['P2P', 'CDN']
+      }))
+    },
 
-    function appendData (graphData, category, index) {
+    appendData (bandwidthData, columns, category, index) {
       let offset = (category === 'p2p') ? 0 : 1
-      if (index < graphData[category].length) {
-        let data = graphData[category][index]
+      if (index < bandwidthData[category].length) {
+        let data = bandwidthData[category][index]
         if (data.length === 2) {
           columns[0 + offset].push(data[0])
           columns[2 + offset].push(data[1])
         }
       }
-    }
-    let maxData = Math.max(this.graphData['p2p'].length, this.graphData['cdn'].length)
+    },
 
-    for (let i = 0; i < maxData; i++) {
-      appendData(this.graphData, 'p2p', i)
-      appendData(this.graphData, 'cdn', i)
-    }
+    prepareColumnData () {
+      var columns = [
+        ['x1'],
+        ['x2'],
+        ['P2P'],
+        ['CDN']
+      ]
 
+      let maxData = Math.max(this.bandwidthData['p2p'].length, this.bandwidthData['cdn'].length)
+
+      for (let i = 0; i < maxData; i++) {
+        this.appendData(this.bandwidthData, columns, 'p2p', i)
+        this.appendData(this.bandwidthData, columns, 'cdn', i)
+      }
+
+      return columns
+    }
+  },
+  mounted () {
     const options = {
+      subchart: {
+        show: true
+      },
       zoom: {
         enabled: true
       },
@@ -72,7 +89,7 @@ export default {
         }
       },
       data: {
-        columns: columns,
+        columns: this.prepareColumnData(),
         xs: {
           'P2P': 'x1',
           'CDN': 'x2'
