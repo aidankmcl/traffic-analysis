@@ -12,11 +12,11 @@ export default {
   state: {
     fromTime: then.getTime(),
     toTime: now,
-    data: {}
+    networkData: {}
   },
   mutations: {
-    setData (state, data) {
-      state.data = data
+    setData (state, networkData) {
+      state.networkData = networkData
     },
     // Both of these take time in milliseconds since epoch
     setFromTime (state, time) {
