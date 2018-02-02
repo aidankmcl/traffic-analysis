@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <vue-c3 :handler="handler" class="bandwidth-chart"></vue-c3>
+  <div class="bandwidth-chart">
+    <vue-c3 :handler="handler"></vue-c3>
   </div>
 </template>
 
@@ -84,7 +84,7 @@ export default {
         },
         y: {
           tick: {
-            format: function (x) { return (x / 1000000000).toFixed(2).toString() + 'Gbps' },
+            format: function (x) { return (x / 1000000000).toFixed(2).toString() + ' Gbps' },
             count: 5
           }
         }
@@ -111,12 +111,26 @@ export default {
 }
 </script>
 
-<style>
-@import './../assets/styles/c3.min.css'
-</style>
+<style lang="sass">
+@import '../assets/styles/c3.min.css'
+@import '../assets/styles/variables.scss'
 
-<style type="text/css">
-.c3-axis-x .tick line{
-  display: none;
-}
+.bandwidth-chart
+  .c3-axis-x .tick line
+    display: none
+
+  .c3-shape
+    &.c3-line
+      &.c3-line-P2P
+        stroke-width: 4px !important
+      &.c3-line-CDN
+        stroke-width: 2px !important
+    &.c3-area
+      &.c3-area-P2P
+        // Only using important because the other chart styles are on the element
+        fill: lighten($light-blue, 25%) !important
+        opacity: 1 !important
+      &.c3-area-CDN
+        fill: lighten($berry, 50%) !important
+        opacity: 1 !important
 </style>

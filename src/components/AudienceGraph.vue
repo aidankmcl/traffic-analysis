@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <vue-c3 :handler="handler" class="audience-chart"></vue-c3>
+  <div class="audience-chart">
+    <vue-c3 :handler="handler"></vue-c3>
   </div>
 </template>
 
@@ -50,8 +50,6 @@ export default {
         }
       }
 
-      console.log('COLUMNS: ', columns)
-
       return columns
     }
   },
@@ -70,13 +68,16 @@ export default {
         },
         y: {
           tick: {
-            format: function (x) { return x },
+            format: function (x) { return Math.round(x / 1000).toString() + 'K' },
             culling: true
           }
         }
       },
       data: {
         x: 'x',
+        colors: {
+          Viewers: '#E65F00'
+        },
         columns: this.prepareColumnData()
       }
     }
@@ -90,8 +91,11 @@ export default {
 @import './../assets/styles/c3.min.css'
 </style>
 
-<style type="text/css">
-.c3-axis-x .tick line{
-  display: none;
-}
+<style lang="sass">
+.audience-chart
+  .c3-axis-x .tick line
+    display: none
+
+  .c3-shape.c3-line.c3-line-Viewers
+    stroke-width: 2px !important
 </style>
