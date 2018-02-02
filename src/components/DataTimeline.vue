@@ -75,7 +75,7 @@ export default {
         x: {
           type: 'timeseries',
           tick: {
-            count: 5,
+            count: 6,
             format: function (x) { return moment(x).format('D MMM') }
           }
         },
@@ -93,6 +93,9 @@ export default {
           Viewers: '#E65F00'
         },
         columns: this.prepareColumnData()
+      },
+      oninit: function () {
+        console.log(document.querySelector('.timeline-chart svg g:nth-child(1)'))
       }
     }
 
@@ -107,13 +110,17 @@ export default {
 
 .timeline-chart
   position: relative
-  top: -200px
+  top: 0
+
+  svg
+    height: 110px
 
   svg > defs, svg > g:nth-child(2), svg > g:nth-child(4)
     display: none
     height: 0
 
   svg > g:nth-child(3)
+
     g.c3-lines.c3-lines-Viewers > path
       stroke: white !important
 

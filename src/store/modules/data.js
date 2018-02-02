@@ -57,7 +57,7 @@ export default {
           commit('setBandwidth', res.data)
         },
         function failure (err) {
-          // TODO: Error handling
+          // FUTURE: Error handling
           console.error(err.response)
         })
     },
@@ -73,7 +73,7 @@ export default {
           commit('setAudience', res.data)
         },
         function failure (err) {
-          // TODO: Error handling
+          // FUTURE: Error handling
           console.error(err.response)
         })
     }

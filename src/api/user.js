@@ -4,6 +4,8 @@ Requests required for User actions
 
 import axios from 'axios'
 
+import { buildTokenRequest } from './helpers.js'
+
 function login (credentials, success, failure) {
   axios.post(
     'http://localhost:3000/auth',
@@ -15,25 +17,8 @@ function login (credentials, success, failure) {
     .catch(failure)
 }
 
-function getInfo (token, success, failure) {
-  axios.post(
-    'http://localhost:3000/myinfo',
-    {
-      'session_token': token
-    })
-    .then(success)
-    .catch(failure)
-}
-
-function logout (token, success, failure) {
-  axios.post(
-    'http://localhost:3000/logout',
-    {
-      'session_token': token
-    })
-    .then(success)
-    .catch(failure)
-}
+const getInfo = buildTokenRequest('http://localhost:3000/myinfo')
+const logout = buildTokenRequest('http://localhost:3000/logout')
 
 export default {
   login,

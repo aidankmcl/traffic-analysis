@@ -32,8 +32,11 @@ export default {
       */
 
       return new Promise((resolve, reject) => {
-        // TODO: Stale token renewal
         if (state.token !== '') return resolve(state.token) // if logged in, no need!
+        /*
+        Note: If you get out of sync with server as is, the only recourse would
+        be to clear your cookies and retry logging in. Could do this programmatically.
+        */
 
         UserAPI.login(
           credentials,
@@ -42,7 +45,7 @@ export default {
             resolve(res.data['session_token'])
           },
           function failure (err) {
-            // TODO: Handle already being logged in
+            // FUTURE: Handle already being logged in (loosely handled by router)
             reject(err.response)
           })
       })
@@ -64,7 +67,7 @@ export default {
             resolve(res.data)
           },
           function failure (err) {
-            // TODO: Handle already being logged in
+            // FUTURE: Handle already being logged in (loosely handled by router)
             reject(err.response)
           })
       })

@@ -22,7 +22,11 @@ export default new Router({
     {
       path: '/login',
       name: 'Login',
-      component: Login
+      component: Login,
+      beforeEnter: (to, from, next) => {
+        if (Store.state.user.token !== '') return next('/')
+        next()
+      }
     }
   ]
 })

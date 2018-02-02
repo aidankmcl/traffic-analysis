@@ -1,8 +1,8 @@
 <template>
-  <form @submit.prevent="submitForm">
-    <input type="text" name="identifiant" placeholder="Username" v-model="username"/>
-    <input type="password" name="password" placeholder="Password" v-model="password"/>
-    <button type="submit">Submit</button>
+  <form class="login-form" @submit.prevent="submitForm">
+    <input class="form-control my-4" type="text" name="identifiant" placeholder="Username" v-model="username"/>
+    <input class="form-control my-4" type="password" name="password" placeholder="Password" v-model="password"/>
+    <button class="form-control my-4" type="submit">Submit</button>
   </form>
 </template>
 
@@ -35,10 +35,29 @@ export default {
           this.$emit('success', token)
         })
         .catch((err) => {
-          // TODO: Default handling of errors within component.
+          // FUTURE: Default handling of errors within component.
           this.$emit('failure', err)
         })
     }
   }
 }
 </script>
+
+<style lang="sass">
+@import '../assets/styles/bootstrap.min.css'
+@import '../assets/styles/variables.scss'
+@import '../assets/styles/mixins.scss'
+
+.login-form
+  button
+    background: $light-blue
+    color: white
+    font-weight: bold
+    font-family: "Roboto"
+    outline: none
+    border: 0
+    cursor: pointer
+    @include shift()
+    &:hover
+      background: lighten($light-blue, 5%)
+</style>
