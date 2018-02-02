@@ -70,7 +70,6 @@ export default {
       DataAPI.getAudience(
         payload,
         function success (res) {
-          console.log('AUDIENCE: ', res.data)
           commit('setAudience', res.data)
         },
         function failure (err) {

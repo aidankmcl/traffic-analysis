@@ -14,33 +14,45 @@ export default {
     'vue-c3': VueC3
   },
   props: {
-    bandwidthData: Object
+    bandwidthData: Object,
+    zoom: Array
   },
   data: function () {
     return {
-      handler: new Vue()
+      handler: new Vue(),
+      aspectRatio: 0
     }
   },
   watch: {
     bandwidthData: function () {
+      // Want to make sure chart updates any time new data is supplied
       this.updateChart()
+    },
+    zoom: function (domain) {
+      this.handler.$emit('dispatch', (chart) => chart.zoom(domain))
     }
   },
   methods: {
+    getAspectRatio () {
+      this.handler.$emit('dispatch', (chart) => { chart.height(100) })
+    },
+
     updateChart () {
       const columns = this.prepareColumnData()
       this.handler.$emit('dispatch', (chart) => chart.load({
         columns: columns,
-        unload: ['P2P', 'CDN']
+        unload: ['P2P', 'CDN'] // data to be replaced
       }))
     },
 
     appendData (bandwidthData, columns, category, index) {
+      // Make sure we're still within range!
       if (index < bandwidthData[category].length) {
         // P2P data is stacked on top of CDN values for the same measurement time
         let dataOffset = (category === 'p2p') ? bandwidthData['cdn'][index][1] : 0
         let data = bandwidthData[category][index]
 
+        // Only want to include good data! :)
         if (data.length === 2) {
           // To append to correct columns of C3 input
           let indexOffset = (category === 'p2p') ? 0 : 1
@@ -52,6 +64,7 @@ export default {
     },
 
     prepareColumnData () {
+      // C3 takes a sort of strange format, but generally a very nice library!
       var columns = [
         ['x1'],
         ['x2'],
@@ -59,6 +72,7 @@ export default {
         ['CDN']
       ]
 
+      // Just a double check in case they don't line up.
       let maxData = Math.max(this.bandwidthData['p2p'].length, this.bandwidthData['cdn'].length)
 
       for (let i = 0; i < maxData; i++) {
@@ -70,10 +84,14 @@ export default {
     }
   },
   mounted () {
+    const updateZoom = this.updateZoom
+
     const options = {
       legend: { position: 'inset' },
-      subchart: { show: true },
-      zoom: { enabled: true },
+      zoom: {
+        enabled: false,
+        onzoom: updateZoom // Unfortunately this event doesn't fire :(
+      },
       point: { show: false },
       axis: {
         x: {

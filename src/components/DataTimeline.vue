@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <vue-c3 :handler="handler" class="audience-chart"></vue-c3>
+  <div class="timeline-chart">
+    <vue-c3 :handler="handler"></vue-c3>
   </div>
 </template>
 
@@ -14,7 +14,8 @@ export default {
     'vue-c3': VueC3
   },
   props: {
-    audienceData: Object
+    timelineData: Object,
+    updateZoom: Function
   },
   data: function () {
     return {
@@ -22,8 +23,8 @@ export default {
     }
   },
   watch: {
-    audienceData: function () {
-      console.log(this.audienceData)
+    timelineData: function () {
+      // Want to make sure chart updates any time new data is supplied
       this.updateChart()
     }
   },
@@ -32,18 +33,22 @@ export default {
       const columns = this.prepareColumnData()
       this.handler.$emit('dispatch', (chart) => chart.load({
         columns: columns,
-        unload: ['Viewers']
+        unload: ['Viewers'] // data to be replaced
       }))
     },
 
     prepareColumnData () {
+      // C3 takes a sort of strange format, but generally a very nice library!
       var columns = [
         ['x'],
         ['Viewers']
       ]
 
-      for (let i = 0; i < this.audienceData['audience'].length; i++) {
-        let data = this.audienceData['audience'][i]
+      // Add everything in to prep for plugging into C3 API
+      for (let i = 0; i < this.timelineData['audience'].length; i++) {
+        let data = this.timelineData['audience'][i]
+
+        // Only proper data please :)
         if (data.length === 2) {
           columns[0].push(data[0])
           columns[1].push(data[1])
@@ -54,15 +59,19 @@ export default {
     }
   },
   mounted () {
+    var updateZoom = this.updateZoom
     const options = {
       legend: { position: 'inset' },
-      subchart: { show: true },
-      zoom: { enabled: true },
+      subchart: {
+        show: true,
+        onbrush: updateZoom
+      },
       point: { show: false },
       axis: {
         x: {
           type: 'timeseries',
           tick: {
+            count: 5,
             format: function (x) { return moment(x).format('D MMM') }
           }
         },
@@ -75,7 +84,14 @@ export default {
       },
       data: {
         x: 'x',
+        type: 'area-spline',
+        colors: {
+          Viewers: '#E65F00'
+        },
         columns: this.prepareColumnData()
+      },
+      oninit: function () {
+
       }
     }
 
@@ -84,12 +100,46 @@ export default {
 }
 </script>
 
-<style>
-@import './../assets/styles/c3.min.css'
-</style>
+<style lang="sass">
+@import '../assets/styles/c3.min.css'
+@import '../assets/styles/variables.scss'
 
-<style type="text/css">
-.c3-axis-x .tick line{
-  display: none;
-}
+.timeline-chart
+  position: relative
+  top: -200px
+
+  svg > defs, svg > g:nth-child(2), svg > g:nth-child(4)
+    display: none
+    height: 0
+
+  svg > g:nth-child(3)
+    g.c3-lines.c3-lines-Viewers > path
+      stroke: white !important
+
+    g.c3-areas.c3-areas-Viewers > path
+      fill: white !important
+      opacity: 1 !important
+
+    g.c3-brush > rect.extent
+      fill: $dark-blue !important
+      fill-opacity: 1 !important
+      opacity: 0.4 !important
+      stroke: $berry !important
+      stroke-opacity: 1
+      stroke-width: 2px
+
+    .c3-axis-x
+      path
+        stroke-width: 1px
+        fill: white
+        stroke: none
+      .tick
+        line
+          display: none
+        text
+          font-weight: bold
+          fill: white !important
+
+  .c3-shape.c3-line.c3-line-Viewers
+    stroke-width: 2px !important
 </style>

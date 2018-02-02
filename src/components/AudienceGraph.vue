@@ -14,7 +14,8 @@ export default {
     'vue-c3': VueC3
   },
   props: {
-    audienceData: Object
+    audienceData: Object,
+    zoom: Array
   },
   data: function () {
     return {
@@ -23,8 +24,11 @@ export default {
   },
   watch: {
     audienceData: function () {
-      console.log(this.audienceData)
+      // Want to make sure chart updates any time new data is supplied
       this.updateChart()
+    },
+    zoom: function (domain) {
+      this.handler.$emit('dispatch', (chart) => chart.zoom(domain))
     }
   },
   methods: {
@@ -32,18 +36,22 @@ export default {
       const columns = this.prepareColumnData()
       this.handler.$emit('dispatch', (chart) => chart.load({
         columns: columns,
-        unload: ['Viewers']
+        unload: ['Viewers'] // data to be replaced
       }))
     },
 
     prepareColumnData () {
+      // C3 takes a sort of strange format, but generally a very nice library!
       var columns = [
         ['x'],
         ['Viewers']
       ]
 
+      // Add everything in to prep for plugging into C3 API
       for (let i = 0; i < this.audienceData['audience'].length; i++) {
         let data = this.audienceData['audience'][i]
+
+        // Only proper data please :)
         if (data.length === 2) {
           columns[0].push(data[0])
           columns[1].push(data[1])
@@ -54,10 +62,14 @@ export default {
     }
   },
   mounted () {
+    const updateZoom = this.updateZoom
+
     const options = {
       legend: { position: 'inset' },
-      subchart: { show: true },
-      zoom: { enabled: true },
+      zoom: {
+        enabled: false,
+        onzoom: updateZoom // Unfortunately this event doesn't fire :(
+      },
       point: { show: false },
       axis: {
         x: {
@@ -88,7 +100,7 @@ export default {
 </script>
 
 <style>
-@import './../assets/styles/c3.min.css'
+@import '../assets/styles/c3.min.css'
 </style>
 
 <style lang="sass">
