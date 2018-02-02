@@ -12,12 +12,17 @@ export default {
   state: {
     fromTime: then.getTime(),
     toTime: now,
-    networkData: {}
+    bandwidthData: {},
+    audienceData: {}
   },
   mutations: {
-    setData (state, networkData) {
-      state.networkData = networkData
+    setBandwidth (state, bandwidthData) {
+      state.bandwidthData = bandwidthData
     },
+    setAudience (state, audienceData) {
+      state.audienceData = audienceData
+    },
+
     // Both of these take time in milliseconds since epoch
     setFromTime (state, time) {
       state.fromTime = time
@@ -38,12 +43,7 @@ export default {
       commit('setToTime', range.toTime)
 
       dispatch('getBandwidthData', payload)
-        .then((res) => {
-          console.log(res)
-        })
-        .catch((err) => {
-          console.error(err)
-        })
+      dispatch('getAudienceData', payload)
     },
 
     getBandwidthData ({ commit }, payload) {
@@ -51,17 +51,32 @@ export default {
       Provided a payload with user's session_token, from
       */
 
-      return new Promise((resolve, reject) => {
-        DataAPI.getBandwidth(
-          payload,
-          function success (res) {
-            commit('setData', res.data)
-            resolve(res.data)
-          },
-          function failure (err) {
-            reject(err.response)
-          })
-      })
+      DataAPI.getBandwidth(
+        payload,
+        function success (res) {
+          commit('setBandwidth', res.data)
+        },
+        function failure (err) {
+          // TODO: Error handling
+          console.error(err.response)
+        })
+    },
+
+    getAudienceData ({ commit }, payload) {
+      /*
+      Provided a payload with user's session_token, from
+      */
+
+      DataAPI.getAudience(
+        payload,
+        function success (res) {
+          console.log('AUDIENCE: ', res.data)
+          commit('setAudience', res.data)
+        },
+        function failure (err) {
+          // TODO: Error handling
+          console.error(err.response)
+        })
     }
   }
 }

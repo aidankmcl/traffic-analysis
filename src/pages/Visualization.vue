@@ -6,16 +6,17 @@
     <section>
       <input type="date" v-model="fromDatestring" @change="updateRange" name="fromDate">
       <input type="date" v-model="toDatestring" @change="updateRange" name="toDate">
-      <bandwidth-graph :bandwidthData="networkData"></bandwidth-graph>
+      <bandwidth-graph :bandwidthData="bandwidthData"></bandwidth-graph>
+      <audience-graph :audienceData="audienceData"></audience-graph>
     </section>
   </div>
 </template>
 
 <script>
-// import { mapState } from 'vuex'
 import moment from 'moment'
 
 import BandwidthGraph from './../components/BandwidthGraph'
+import AudienceGraph from './../components/AudienceGraph'
 import DataTimeline from './../components/DataTimeline'
 
 export default {
@@ -27,8 +28,11 @@ export default {
     }
   },
   computed: {
-    networkData: function () {
-      return this.$store.state.data.networkData
+    bandwidthData: function () {
+      return this.$store.state.data.bandwidthData
+    },
+    audienceData: function () {
+      return this.$store.state.data.audienceData
     },
     fromDate: function () {
       return moment(this.fromDatestring).toDate()
@@ -39,6 +43,7 @@ export default {
   },
   components: {
     'bandwidth-graph': BandwidthGraph,
+    'audience-graph': AudienceGraph,
     'data-timeline': DataTimeline
   },
   created () {

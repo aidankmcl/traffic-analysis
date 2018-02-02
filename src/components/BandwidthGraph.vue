@@ -36,12 +36,17 @@ export default {
     },
 
     appendData (bandwidthData, columns, category, index) {
-      let offset = (category === 'p2p') ? 0 : 1
       if (index < bandwidthData[category].length) {
+        // P2P data is stacked on top of CDN values for the same measurement time
+        let dataOffset = (category === 'p2p') ? bandwidthData['cdn'][index][1] : 0
         let data = bandwidthData[category][index]
+
         if (data.length === 2) {
-          columns[0 + offset].push(data[0])
-          columns[2 + offset].push(data[1])
+          // To append to correct columns of C3 input
+          let indexOffset = (category === 'p2p') ? 0 : 1
+
+          columns[0 + indexOffset].push(data[0])
+          columns[2 + indexOffset].push(data[1] + dataOffset)
         }
       }
     },
@@ -66,25 +71,21 @@ export default {
   },
   mounted () {
     const options = {
-      subchart: {
-        show: true
-      },
-      zoom: {
-        enabled: true
-      },
-      point: {
-        show: false
-      },
+      legend: { position: 'inset' },
+      subchart: { show: true },
+      zoom: { enabled: true },
+      point: { show: false },
       axis: {
         x: {
           type: 'timeseries',
           tick: {
-            format: function (x) { return moment(x).format('M/DD') }
+            format: function (x) { return moment(x).format('D MMM') }
           }
         },
         y: {
           tick: {
-            format: function (x) { return (x / 1000000000).toString() + 'Gbps' }
+            format: function (x) { return (x / 1000000000).toFixed(2).toString() + 'Gbps' },
+            count: 5
           }
         }
       },
@@ -97,6 +98,10 @@ export default {
         types: {
           'P2P': 'area-spline',
           'CDN': 'area-spline'
+        },
+        colors: {
+          P2P: '#4FBCF2',
+          CDN: '#B2125C'
         }
       }
     }
@@ -108,4 +113,10 @@ export default {
 
 <style>
 @import './../assets/styles/c3.min.css'
+</style>
+
+<style type="text/css">
+.c3-axis-x .tick line{
+  display: none;
+}
 </style>
