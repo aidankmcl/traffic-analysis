@@ -46,7 +46,7 @@ export default {
       dispatch('getAudienceData', payload)
     },
 
-    getBandwidthData ({ commit }, payload) {
+    getBandwidthData ({ commit, dispatch }, payload) {
       /*
       Provided a payload with user's session_token, from
       */
@@ -57,12 +57,17 @@ export default {
           commit('setBandwidth', res.data)
         },
         function failure (err) {
-          // FUTURE: Error handling
+          // FUTURE: Better Error handling
           console.error(err.response)
+
+          if (err.response.status === 403) {
+            // Current user data out of sync, close up shop (kill cookies) and go back to login
+            dispatch('resetUser')
+          }
         })
     },
 
-    getAudienceData ({ commit }, payload) {
+    getAudienceData ({ commit, dispatch }, payload) {
       /*
       Provided a payload with user's session_token, from
       */
@@ -75,6 +80,11 @@ export default {
         function failure (err) {
           // FUTURE: Error handling
           console.error(err.response)
+
+          if (err.response.status === 403) {
+            // Current user data out of sync, close up shop (kill cookies) and go back to login
+            dispatch('resetUser')
+          }
         })
     }
   }

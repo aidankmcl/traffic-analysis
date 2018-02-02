@@ -46,10 +46,11 @@ export default {
         columns: columns,
         unload: ['P2P', 'CDN'], // data to be replaced
         done: function () {
+          // Zooms into the new slice
           self.handler.$emit('dispatch', (chart) => chart.zoom([moment(columns[0][1]).toDate(), moment(columns[0].slice(-1)[0]).toDate()]))
+          // Adds the markers for throughput maximums
           self.handler.$emit('dispatch', (chart) => {
-            chart.ygrids.remove()
-            chart.ygrids.add([
+            chart.ygrids([
               {
                 value: self.maxThroughput,
                 text: 'Max Combined Throughput: ' + (self.maxThroughput / 1000000000).toFixed(2) + ' Gbps'
@@ -96,6 +97,8 @@ export default {
       // Just a double check in case they don't line up.
       let maxData = Math.max(this.bandwidthData['p2p'].length, this.bandwidthData['cdn'].length)
 
+      this.maxCDN = 0
+      this.maxThroughput = 0
       for (let i = 0; i < maxData; i++) {
         // We can grab the max throughput and CDN values here while putting the C3 data together
         let cdnValue = this.bandwidthData['cdn'][i][1]
@@ -178,17 +181,13 @@ export default {
 @import '../assets/styles/variables.scss'
 
 .bandwidth-chart
-  h2
-    font-size: 1.5rem
-    text-align: left
-    margin-bottom: 1.5rem
 
   .c3-ygrid-lines > g
     line
       stroke-dasharray: 8,8
     text
       font-weight: bold
-    
+
     &:nth-child(1)
       line
         stroke: $green
@@ -199,7 +198,7 @@ export default {
       line
         stroke: $berry
       text
-        fill: $berry      
+        fill: $berry
 
     @include respond-to(small)
       line

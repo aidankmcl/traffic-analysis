@@ -4,14 +4,17 @@
 
     <section id="timing" class="container my-5">
       <div class="row">
-        <div class="col-sm-5 col-xs-12">
-          <input class="form-control my-2" type="date" v-model="fromDatestring" @change="updateRange" name="fromDate">
+        <div class="col-12">
+          <h2>Date Range</h2>
         </div>
-        <div class="col-sm-2 col-xs-12 text-center">
-          <span class="to my-2">to</span>
+        <div class="col-sm-5 col-12">
+          <input class="form-control my-1" type="date" v-model="fromDatestring" @change="updateRange" name="fromDate">
         </div>
-        <div class="col-sm-5 col-xs-12">
-          <input class="form-control my-2" type="date" v-model="toDatestring" @change="updateRange" name="toDate">
+        <div class="col-sm-2 col-12 text-center">
+          <span class="to my-1">to</span>
+        </div>
+        <div class="col-sm-5 col-12">
+          <input class="form-control my-1" type="date" v-model="toDatestring" @change="updateRange" name="toDate">
         </div>
       </div>
     </section>
@@ -94,6 +97,11 @@ export default {
 <style lang="sass">
 @import '../assets/styles/bootstrap.min.css'
 @import '../assets/styles/variables'
+
+h2
+  font-size: 1.5rem
+  text-align: left
+  margin-bottom: 1.5rem
 
 section#timing
   .to

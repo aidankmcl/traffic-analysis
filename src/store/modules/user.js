@@ -2,7 +2,9 @@
 Store for sharing User state across application
 */
 
-import UserAPI from './../../api/user'
+import UserAPI from '../../api/user'
+
+import Router from '../../router'
 
 export default {
   state: {
@@ -89,6 +91,12 @@ export default {
             reject(err.response)
           })
       })
+    },
+
+    resetUser ({ commit }) {
+      commit('setToken', '')
+      commit('setUser', {})
+      Router.push('login')
     }
 
   }

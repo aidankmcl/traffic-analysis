@@ -116,10 +116,6 @@ export default {
 @import '../assets/styles/c3.min.css'
 
 .audience-chart
-  h2
-    font-size: 1.5rem
-    text-align: left
-    margin-bottom: 1.5rem
 
   .c3-axis-x .tick line
     display: none
