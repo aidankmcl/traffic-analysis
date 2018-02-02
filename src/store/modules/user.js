@@ -23,7 +23,7 @@ export default {
     }
   },
   actions: {
-    login ({ state, commit, dispatch }, credentials) {
+    login ({ state, commit }, credentials) {
       /*
       Provided an object containing {username: ..., password: ...} will use the
       frontend API to issue a request.
@@ -40,6 +40,28 @@ export default {
           function success (res) {
             commit('setToken', res.data['session_token'])
             resolve(res.data['session_token'])
+          },
+          function failure (err) {
+            // TODO: Handle already being logged in
+            reject(err.response)
+          })
+      })
+    },
+
+    logout ({ state, commit }) {
+      /*
+      Provided an active token, logs user out on the server and redirects to login
+      */
+
+      return new Promise((resolve, reject) => {
+        if (state.token === '') reject(Error('You\'re not currently logged in!'))
+
+        UserAPI.logout(
+          state.token,
+          function success (res) {
+            commit('setToken', '')
+            commit('setUser', {})
+            resolve(res.data)
           },
           function failure (err) {
             // TODO: Handle already being logged in

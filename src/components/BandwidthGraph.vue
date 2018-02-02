@@ -1,6 +1,8 @@
 <template>
   <div class="bandwidth-chart">
-    <vue-c3 :handler="handler"></vue-c3>
+    <h2>Bandwidth Usage</h2>
+    <vue-c3 v-if="bandwidthData['cdn'].length > 0" :handler="handler"></vue-c3>
+    <h1 v-else>No Data for this Timerange</h1>
   </div>
 </template>
 
@@ -19,8 +21,7 @@ export default {
   },
   data: function () {
     return {
-      handler: new Vue(),
-      aspectRatio: 0
+      handler: new Vue()
     }
   },
   watch: {
@@ -33,15 +34,15 @@ export default {
     }
   },
   methods: {
-    getAspectRatio () {
-      this.handler.$emit('dispatch', (chart) => { chart.height(100) })
-    },
-
     updateChart () {
       const columns = this.prepareColumnData()
-      this.handler.$emit('dispatch', (chart) => chart.load({
+      const handler = this.handler
+      handler.$emit('dispatch', (chart) => chart.load({
         columns: columns,
-        unload: ['P2P', 'CDN'] // data to be replaced
+        unload: ['P2P', 'CDN'], // data to be replaced
+        done: function () {
+          handler.$emit('dispatch', (chart) => chart.zoom([moment(columns[0][1]).toDate(), moment(columns[0].slice(-1)[0]).toDate()]))
+        }
       }))
     },
 
@@ -134,6 +135,11 @@ export default {
 @import '../assets/styles/variables.scss'
 
 .bandwidth-chart
+  h2
+    font-size: 1.5rem
+    text-align: left
+    margin-bottom: 1.5rem
+
   .c3-axis-x .tick line
     display: none
 

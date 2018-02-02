@@ -1,6 +1,8 @@
 <template>
   <div class="audience-chart">
-    <vue-c3 :handler="handler"></vue-c3>
+    <h2>Concurrent Viewers</h2>
+    <vue-c3 v-if="audienceData['audience'].length > 0" :handler="handler"></vue-c3>
+    <h1 v-else>No Data for this Timerange</h1>
   </div>
 </template>
 
@@ -34,9 +36,14 @@ export default {
   methods: {
     updateChart () {
       const columns = this.prepareColumnData()
-      this.handler.$emit('dispatch', (chart) => chart.load({
+      const handler = this.handler
+
+      handler.$emit('dispatch', (chart) => chart.load({
         columns: columns,
-        unload: ['Viewers'] // data to be replaced
+        unload: ['Viewers'], // data to be replaced
+        done: function () {
+          handler.$emit('dispatch', (chart) => chart.zoom([moment(columns[0][1]).toDate(), moment(columns[0].slice(-1)[0]).toDate()]))
+        }
       }))
     },
 
@@ -99,12 +106,15 @@ export default {
 }
 </script>
 
-<style>
-@import '../assets/styles/c3.min.css'
-</style>
-
 <style lang="sass">
+@import '../assets/styles/c3.min.css'
+
 .audience-chart
+  h2
+    font-size: 1.5rem
+    text-align: left
+    margin-bottom: 1.5rem
+
   .c3-axis-x .tick line
     display: none
 

@@ -1,10 +1,20 @@
 <template>
   <div>
-    <header class="hello">
-      <h1>Cool Visualization</h1>
-      <input type="date" v-model="fromDatestring" @change="updateRange" name="fromDate">
-      <input type="date" v-model="toDatestring" @change="updateRange" name="toDate">
-    </header>
+    <custom-header></custom-header>
+
+    <section id="timing" class="container my-5">
+      <div class="row">
+        <div class="col-sm-5 col-xs-12">
+          <input class="form-control m-2" type="date" v-model="fromDatestring" @change="updateRange" name="fromDate">
+        </div>
+        <div class="col-sm-2 col-xs-12 text-center">
+          <span class="to m-2">to</span>
+        </div>
+        <div class="col-sm-5 col-xs-12">
+          <input class="form-control m-2" type="date" v-model="toDatestring" @change="updateRange" name="toDate">
+        </div>
+      </div>
+    </section>
 
     <section id="bandwidth" class="container my-5">
       <!-- Pass our data to the graphs and the graphs will update whenever that data changes! -->
@@ -18,7 +28,7 @@
     <footer>
       <div class="container">
         <!-- Passing in audience data since it gives rough idea, timeline doesn't need detail -->
-        <data-timeline :updateZoom="updateZoom" :zoom="timelineZoom" :timelineData="audienceData"></data-timeline>
+        <data-timeline :updateZoom="updateZoom" :timelineData="audienceData"></data-timeline>
       </div>
     </footer>
   </div>
@@ -28,20 +38,23 @@
 import moment from 'moment'
 import debounce from 'lodash/debounce'
 
+import Header from '../components/Header'
 import BandwidthGraph from '../components/BandwidthGraph'
 import AudienceGraph from '../components/AudienceGraph'
 import DataTimeline from '../components/DataTimeline'
 
+const fifteenDaysAgo = moment().subtract(15, 'days')
 export default {
   name: 'Visualization',
   components: {
+    'custom-header': Header,
     'bandwidth-graph': BandwidthGraph,
     'audience-graph': AudienceGraph,
     'data-timeline': DataTimeline
   },
   data: function () {
     return {
-      fromDatestring: moment().subtract(1, 'months').format('YYYY-MM-DD'),
+      fromDatestring: fifteenDaysAgo.format('YYYY-MM-DD'),
       toDatestring: moment().format('YYYY-MM-DD'),
       timelineZoom: []
     }
@@ -54,6 +67,7 @@ export default {
       return this.$store.state.data.audienceData
     },
     fromDate: function () {
+      if (!this.fromDatestring) return fifteenDaysAgo.toDate()
       return moment(this.fromDatestring).toDate()
     },
     toDate: function () {
@@ -64,8 +78,9 @@ export default {
     this.updateRange()
   },
   methods: {
-    updateRange (stuff) {
+    updateRange () {
       let range = {fromTime: this.fromDate.getTime(), toTime: this.toDate.getTime()}
+      this.updateZoom([this.fromDate, this.toDate])
       this.$store.dispatch('updateRange', range)
     },
     updateZoom: debounce(function (domain) {
@@ -79,6 +94,12 @@ export default {
 <style lang="sass">
 @import '../assets/styles/bootstrap.min.css'
 @import '../assets/styles/variables'
+
+section#timing
+  .to
+    display: block
+    font-size: 1.5rem
+    font-weight: bold
 
 section#audience
   padding-bottom: 8rem
