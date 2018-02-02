@@ -185,13 +185,10 @@ export default {
 
   .c3-ygrid-lines > g
     line
-      stroke-width: 2px
       stroke-dasharray: 8,8
     text
       font-weight: bold
-      @include respond-to(medium)
-        &
-          font-size: 14px
+    
     &:nth-child(1)
       line
         stroke: $green
@@ -202,15 +199,19 @@ export default {
       line
         stroke: $berry
       text
-        fill: $berry
-
-      
+        fill: $berry      
 
     @include respond-to(small)
       line
         stroke-width: 1px
       text
         font-size: 10px
+
+    @include respond-to(medium)
+      line
+        stroke-width: 2px
+      text
+        font-size: 14px
 
   .c3-axis-x .tick line
     display: none
