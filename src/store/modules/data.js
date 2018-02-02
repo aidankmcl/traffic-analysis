@@ -16,11 +16,11 @@ export default {
     audienceData: {}
   },
   mutations: {
-    setBandwidth (state, bandwidthData) {
-      state.bandwidthData = bandwidthData
+    setBandwidth (state, data) {
+      state.bandwidthData = data
     },
-    setAudience (state, audienceData) {
-      state.audienceData = audienceData
+    setAudience (state, data) {
+      state.audienceData = data
     },
 
     // Both of these take time in milliseconds since epoch

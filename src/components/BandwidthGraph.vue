@@ -22,13 +22,14 @@ export default {
   data: function () {
     return {
       handler: new Vue(),
+      maxCDN: 0,
+      maxThroughput: 0,
       showGraph: false
     }
   },
   watch: {
     bandwidthData: function () {
       this.showGraph = this.bandwidthData['cdn'] && this.bandwidthData['cdn'].length > 0
-      console.log('SHOW Bandwidth: ', this.showGraph)
       // Want to make sure chart updates any time new data is supplied
       if (this.showGraph) this.updateChart()
     },
@@ -39,13 +40,26 @@ export default {
   methods: {
     updateChart () {
       const columns = this.prepareColumnData()
-      const handler = this.handler
+      const self = this
 
-      handler.$emit('dispatch', (chart) => chart.load({
+      self.handler.$emit('dispatch', (chart) => chart.load({
         columns: columns,
         unload: ['P2P', 'CDN'], // data to be replaced
         done: function () {
-          handler.$emit('dispatch', (chart) => chart.zoom([moment(columns[0][1]).toDate(), moment(columns[0].slice(-1)[0]).toDate()]))
+          self.handler.$emit('dispatch', (chart) => chart.zoom([moment(columns[0][1]).toDate(), moment(columns[0].slice(-1)[0]).toDate()]))
+          self.handler.$emit('dispatch', (chart) => {
+            chart.ygrids.remove()
+            chart.ygrids.add([
+              {
+                value: self.maxThroughput,
+                text: 'Max Combined Throughput: ' + (self.maxThroughput / 1000000000).toFixed(2) + ' Gbps'
+              },
+              {
+                value: self.maxCDN,
+                text: 'Max CDN Throughput: ' + (self.maxCDN / 1000000000).toFixed(2) + ' Gbps'
+              }
+            ])
+          })
         }
       }))
     },
@@ -83,23 +97,28 @@ export default {
       let maxData = Math.max(this.bandwidthData['p2p'].length, this.bandwidthData['cdn'].length)
 
       for (let i = 0; i < maxData; i++) {
+        // We can grab the max throughput and CDN values here while putting the C3 data together
+        let cdnValue = this.bandwidthData['cdn'][i][1]
+        let p2pValue = this.bandwidthData['p2p'][i][1]
+        this.maxCDN = (this.maxCDN < cdnValue) ? cdnValue : this.maxCDN
+        this.maxThroughput = (this.maxThroughput < cdnValue + p2pValue) ? cdnValue + p2pValue : this.maxThroughput
+
         this.appendData(this.bandwidthData, columns, 'p2p', i)
         this.appendData(this.bandwidthData, columns, 'cdn', i)
       }
-
-      console.log('Bandwidth columns: ', columns)
 
       return columns
     }
   },
   mounted () {
-    const updateZoom = this.updateZoom
+    const self = this
+    const gigabit = 1000000000
 
     const options = {
       legend: { position: 'inset' },
       zoom: {
         enabled: false,
-        onzoom: updateZoom // Unfortunately this event doesn't fire :(
+        onzoom: self.updateZoom // Unfortunately this event doesn't fire :(
       },
       point: { show: false },
       axis: {
@@ -111,13 +130,28 @@ export default {
         },
         y: {
           tick: {
-            format: function (x) { return (x / 1000000000).toFixed(2).toString() + ' Gbps' },
+            format: function (x) { return (x / gigabit).toFixed(2).toString() + ' Gbps' },
             count: 5
           }
         }
       },
+      tooltip: {
+        format: {
+          title: function (x) { return moment(x).format('dddd, MMMM D, hh:mm a') },
+          value: function (value, ratio, id, index) {
+            var data
+            if (id === 'P2P') {
+              data = ((value - self.bandwidthData['cdn'][index][1]) / gigabit).toFixed(2)
+            } else {
+              data = (value / gigabit).toFixed(2)
+            }
+
+            return data + ' Gbps'
+          }
+        }
+      },
       data: {
-        columns: this.prepareColumnData(),
+        columns: self.prepareColumnData(),
         xs: {
           'P2P': 'x1',
           'CDN': 'x2'
@@ -140,6 +174,7 @@ export default {
 
 <style lang="sass">
 @import '../assets/styles/c3.min.css'
+@import '../assets/styles/mixins.scss'
 @import '../assets/styles/variables.scss'
 
 .bandwidth-chart
@@ -147,6 +182,35 @@ export default {
     font-size: 1.5rem
     text-align: left
     margin-bottom: 1.5rem
+
+  .c3-ygrid-lines > g
+    line
+      stroke-width: 2px
+      stroke-dasharray: 8,8
+    text
+      font-weight: bold
+      @include respond-to(medium)
+        &
+          font-size: 14px
+    &:nth-child(1)
+      line
+        stroke: $green
+      text
+        fill: $green
+
+    &:nth-child(2)
+      line
+        stroke: $berry
+      text
+        fill: $berry
+
+      
+
+    @include respond-to(small)
+      line
+        stroke-width: 1px
+      text
+        font-size: 10px
 
   .c3-axis-x .tick line
     display: none

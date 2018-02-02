@@ -94,9 +94,7 @@ export default {
         },
         columns: this.prepareColumnData()
       },
-      oninit: function () {
-        console.log(document.querySelector('.timeline-chart svg g:nth-child(1)'))
-      }
+      oninit: function () {}
     }
 
     this.handler.$emit('init', options)

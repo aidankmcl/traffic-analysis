@@ -28,7 +28,6 @@ export default {
   watch: {
     audienceData: function () {
       this.showGraph = this.audienceData.audience && this.audienceData.audience.length > 0
-      console.log('SHOW audience: ', this.showGraph)
       // Want to make sure chart updates any time new data is supplied
       if (this.showGraph) this.updateChart()
     },
