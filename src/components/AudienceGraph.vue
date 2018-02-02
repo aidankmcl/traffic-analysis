@@ -1,8 +1,8 @@
 <template>
   <div class="audience-chart">
     <h2>Concurrent Viewers</h2>
-    <vue-c3 v-if="audienceData['audience'].length > 0" :handler="handler"></vue-c3>
-    <h1 v-else>No Data for this Timerange</h1>
+    <vue-c3 v-show="showGraph" :handler="handler"></vue-c3>
+    <h1 v-show="!showGraph">No Data for this Timerange</h1>
   </div>
 </template>
 
@@ -21,13 +21,16 @@ export default {
   },
   data: function () {
     return {
-      handler: new Vue()
+      handler: new Vue(),
+      showGraph: false
     }
   },
   watch: {
     audienceData: function () {
+      this.showGraph = this.audienceData.audience && this.audienceData.audience.length > 0
+      console.log('SHOW audience: ', this.showGraph)
       // Want to make sure chart updates any time new data is supplied
-      this.updateChart()
+      if (this.showGraph) this.updateChart()
     },
     zoom: function (domain) {
       this.handler.$emit('dispatch', (chart) => chart.zoom(domain))
@@ -54,9 +57,11 @@ export default {
         ['Viewers']
       ]
 
+      if (!this.showGraph) return columns
+
       // Add everything in to prep for plugging into C3 API
-      for (let i = 0; i < this.audienceData['audience'].length; i++) {
-        let data = this.audienceData['audience'][i]
+      for (let i = 0; i < this.audienceData.audience.length; i++) {
+        let data = this.audienceData.audience[i]
 
         // Only proper data please :)
         if (data.length === 2) {
@@ -64,6 +69,8 @@ export default {
           columns[1].push(data[1])
         }
       }
+
+      console.log('audience columns: ', columns)
 
       return columns
     }

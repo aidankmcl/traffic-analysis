@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+import Store from '@/store'
+
 import Visualization from '@/pages/Visualization'
 import Login from '@/pages/Login'
 
@@ -13,7 +15,7 @@ export default new Router({
       name: 'Visualization',
       component: Visualization,
       beforeEnter: (to, from, next) => {
-        // Add logic for redirecting to Login if no session_token is available in store.
+        if (Store.state.user.token === '') return next('/login')
         next()
       }
     },

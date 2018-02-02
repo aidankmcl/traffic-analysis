@@ -20,8 +20,8 @@ export default {
   data () {
     // NOTE: Only for demo, would never toss credentials into app code!
     return {
-      sampleUsername: 'swagtv',
-      samplePassword: 'bling$bling'
+      sampleUsername: 'urtoob',
+      samplePassword: 'ToobRU'
     }
   },
   methods: {

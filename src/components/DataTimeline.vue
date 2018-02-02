@@ -19,11 +19,13 @@ export default {
   },
   data: function () {
     return {
-      handler: new Vue()
+      handler: new Vue(),
+      showGraph: false
     }
   },
   watch: {
     timelineData: function () {
+      this.showGraph = this.timelineData.audience && this.timelineData.audience.length > 0
       // Want to make sure chart updates any time new data is supplied
       this.updateChart()
     }
@@ -43,6 +45,8 @@ export default {
         ['x'],
         ['Viewers']
       ]
+
+      if (!this.showGraph) return columns
 
       // Add everything in to prep for plugging into C3 API
       for (let i = 0; i < this.timelineData['audience'].length; i++) {
@@ -89,9 +93,6 @@ export default {
           Viewers: '#E65F00'
         },
         columns: this.prepareColumnData()
-      },
-      oninit: function () {
-
       }
     }
 

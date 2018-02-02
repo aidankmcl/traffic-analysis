@@ -1,8 +1,8 @@
 <template>
   <div class="bandwidth-chart">
     <h2>Bandwidth Usage</h2>
-    <vue-c3 v-if="bandwidthData['cdn'].length > 0" :handler="handler"></vue-c3>
-    <h1 v-else>No Data for this Timerange</h1>
+    <vue-c3 v-show="showGraph" :handler="handler"></vue-c3>
+    <h1 v-show="!showGraph">No Data for this Timerange</h1>
   </div>
 </template>
 
@@ -21,13 +21,16 @@ export default {
   },
   data: function () {
     return {
-      handler: new Vue()
+      handler: new Vue(),
+      showGraph: false
     }
   },
   watch: {
     bandwidthData: function () {
+      this.showGraph = this.bandwidthData['cdn'] && this.bandwidthData['cdn'].length > 0
+      console.log('SHOW Bandwidth: ', this.showGraph)
       // Want to make sure chart updates any time new data is supplied
-      this.updateChart()
+      if (this.showGraph) this.updateChart()
     },
     zoom: function (domain) {
       this.handler.$emit('dispatch', (chart) => chart.zoom(domain))
@@ -37,6 +40,7 @@ export default {
     updateChart () {
       const columns = this.prepareColumnData()
       const handler = this.handler
+
       handler.$emit('dispatch', (chart) => chart.load({
         columns: columns,
         unload: ['P2P', 'CDN'], // data to be replaced
@@ -73,6 +77,8 @@ export default {
         ['CDN']
       ]
 
+      if (!this.showGraph) return columns
+
       // Just a double check in case they don't line up.
       let maxData = Math.max(this.bandwidthData['p2p'].length, this.bandwidthData['cdn'].length)
 
@@ -80,6 +86,8 @@ export default {
         this.appendData(this.bandwidthData, columns, 'p2p', i)
         this.appendData(this.bandwidthData, columns, 'cdn', i)
       }
+
+      console.log('Bandwidth columns: ', columns)
 
       return columns
     }
