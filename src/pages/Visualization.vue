@@ -103,6 +103,9 @@ h2
   text-align: left
   margin-bottom: 1.5rem
 
+input[type="date"]
+  cursor: pointer
+
 section#timing
   .to
     display: block
